@@ -6,3 +6,9 @@ class UserDataRes(BaseModel):
     username: str
     email: str
     role: str
+
+
+class ProjectDataResponse(BaseModel):
+    project_id: int
+    project_name: str
+    created_at: str

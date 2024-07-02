@@ -2,7 +2,6 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.model.db_model import User
-from app.schema.request.request_schema import SignInRequest
 
 
 async def get_by_username(db: AsyncSession, username: str):
@@ -17,7 +16,6 @@ async def get_by_username(db: AsyncSession, username: str):
 
 async def get_by_email(db: AsyncSession, email: str):
     try:
-        print("database layer called. email is: ", email)
         result = await db.execute(
             select(User).where(email == User.email)
         )

@@ -1,12 +1,14 @@
 import re
 
-from pydantic import BaseModel, field_validator, ValidationInfo
+from pydantic import BaseModel, ValidationError, ValidationInfo, field_validator
 
 
-# create user request schema
-class UserReqBase(BaseModel):
+class UserModel(BaseModel):
+    ...
     username: str
-    password: str
+    email: str
+
+    #  if not re.match(r'^[a-zA-Z0-9]+$', v):
 
     @field_validator("username")
     def username_match(cls, v: str, info: ValidationInfo) -> str:
@@ -21,13 +23,7 @@ class UserReqBase(BaseModel):
         return v
 
 
-class SignInRequest(UserReqBase):
-    password: str
-
-
-class LoginRequest(UserReqBase):
-    pass
-
-
-class CreateProjectRequest(BaseModel):
-    project_name: str
+try:
+    UserModel(username="abc!", email="abcdemail.com")
+except ValidationError as err:
+    print(err.json(indent=4))
