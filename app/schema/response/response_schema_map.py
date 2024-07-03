@@ -1,4 +1,4 @@
-from app.model.db_model import User, Project
+from app.model.db_model import User, Project, ResponseSentence
 from app.schema.response.response_schema import UserDataRes, ProjectDataResponse
 
 
@@ -19,3 +19,4 @@ def map_project_to_projectdataresponse(project: Project) -> ProjectDataResponse:
         created_at=project.created_at
     )
     return project_data
+

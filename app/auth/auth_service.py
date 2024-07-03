@@ -130,15 +130,15 @@ async def get_current_user(
 async def get_current_active_admin(
         current_user: UserModel = Security(get_current_user, scopes=["admin"])
 ):
-    if current_user.disabled:
+    if not current_user.is_allowed:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
 
 async def get_current_active_user(
-        current_user: UserModel = Security(get_current_user, scopes=["regular_user"])
+        current_user: UserModel = Security(get_current_user, scopes=["reg_user"])
 ):
-    if current_user.disabled:
+    if not current_user.is_allowed:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 

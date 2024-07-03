@@ -1,4 +1,3 @@
-# app/routers/auth.py
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Security
