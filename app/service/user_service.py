@@ -1,19 +1,18 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.model.db_model import User
-from app.config.database.redis_config import storeValueRedis, getStoredValueRedis
-
-import app.crud.source_sentence_crud as source_sentence_crud
 import app.crud.response_sentence_crud as response_sentence_crud
-from app.schema.request.request_schema import CreateResponseSentenceRequest
-from app.schema.request.request_schema_map import (
-    create_response_sentence_request_to_response_sentence,
-)
+import app.crud.source_sentence_crud as source_sentence_crud
+from app.config.database.redis_config import store_value_redis, get_stored_value_redis
 from app.exception import (
     BadRequestError,
     InternalServerError,
     ConflictError,
     NotFoundError,
+)
+from app.model.db_model import User, SourceSentence
+from app.schema.request.request_schema import CreateResponseSentenceRequest
+from app.schema.request.request_schema_map import (
+    create_response_sentence_request_to_response_sentence,
 )
 
 
@@ -38,12 +37,12 @@ async def get_next_source_id(db, source_id: int) -> int | None:
 
 
 async def create_new_response(
-    db: AsyncSession, req_data: CreateResponseSentenceRequest, user: User
+        db: AsyncSession, req_data: CreateResponseSentenceRequest, user: User
 ):
     try:
-        allowed_sentence_id = getStoredValueRedis(user.id)
+        allowed_sentence_id = int(await get_stored_value_redis(user.id))
         if not allowed_sentence_id or allowed_sentence_id != req_data.source_id:
-            raise BadRequestError("Not allowed to response this sentence.")
+            raise BadRequestError(detail="Not allowed to response this sentence.")
 
         source_sentence = await source_sentence_crud.get_by_id(db, req_data.source_id)
         if not source_sentence:
@@ -71,7 +70,7 @@ async def create_new_response(
 
 
 async def get_response_sentence_by_user_id(
-    db: AsyncSession, user_id: int, limit: int, skip: int
+        db: AsyncSession, user_id: int, limit: int, skip: int
 ):
     try:
         results = await response_sentence_crud.get_by_user_id(db, user_id, limit, skip)
@@ -80,14 +79,14 @@ async def get_response_sentence_by_user_id(
         raise e
 
 
-async def get_source_sentence(db: AsyncSession, user: User):
+async def get_source_sentence(db: AsyncSession, user: User) -> SourceSentence:
     try:
-        ongoing_source_id = getStoredValueRedis(user.id)
+        ongoing_source_id = int(await get_stored_value_redis(user.id))
         if ongoing_source_id:
             source_sentence = await source_sentence_crud.get_by_id(
                 db, ongoing_source_id
             )
-            storeValueRedis(user.id, ongoing_source_id + 1)
+            await store_value_redis(user.id, ongoing_source_id + 1)
             return source_sentence
 
         ongoing_id = await response_sentence_crud.get_last_source_id_by_user_id(
@@ -98,9 +97,9 @@ async def get_source_sentence(db: AsyncSession, user: User):
 
         source_sentence = await source_sentence_crud.get_by_id(db, ongoing_id)
         if not source_sentence:
-            raise BadRequestError("No source sentence found.")
+            raise BadRequestError(detail="No source sentence found.")
 
-        storeValueRedis(user.id, source_sentence.sentence_id)
+        await store_value_redis(user.id, source_sentence.sentence_id)
         return source_sentence
     except Exception as e:
         raise e
@@ -108,7 +107,7 @@ async def get_source_sentence(db: AsyncSession, user: User):
 
 async def get_new_source_sentence(db: AsyncSession, user: User):
     try:
-        ongoing_source_id = getStoredValueRedis(user.id)
+        ongoing_source_id = int(await get_stored_value_redis(user.id))
         if ongoing_source_id:
             source_sentence = await source_sentence_crud.get_by_id(
                 db, ongoing_source_id
@@ -118,7 +117,7 @@ async def get_new_source_sentence(db: AsyncSession, user: User):
             if not next_sentence_id or next_sentence:
                 raise NotFoundError(detail="New sentence not found!")
 
-            storeValueRedis(user.id, next_sentence_id)
+            await store_value_redis(user.id, next_sentence_id)
             return next_sentence
 
         ongoing_id = await response_sentence_crud.get_last_source_id_by_user_id(
@@ -135,7 +134,7 @@ async def get_new_source_sentence(db: AsyncSession, user: User):
         if not next_sentence:
             raise NotFoundError(detail="New sentence not found!")
 
-        storeValueRedis(user.id, next_sentence_id)
+        await store_value_redis(user.id, next_sentence_id)
         return
 
     except Exception as e:

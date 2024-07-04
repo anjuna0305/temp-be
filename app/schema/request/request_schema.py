@@ -35,5 +35,5 @@ class CreateProjectRequest(BaseModel):
 
 class CreateResponseSentenceRequest(BaseModel):
     source_id: int
-    project_id:int
+    project_id: int
     sentence: str
