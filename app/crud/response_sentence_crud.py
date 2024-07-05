@@ -27,7 +27,7 @@ async def get_by_id(db: AsyncSession, response_id: int):
 
 
 async def get_by_user_id(
-    db: AsyncSession, user_id: int, limit_value: int = 20, offset_value: int = 0
+        db: AsyncSession, user_id: int, limit_value: int = 20, offset_value: int = 0
 ):
     try:
         result = await db.execute(

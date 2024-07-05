@@ -54,3 +54,10 @@ class ResponseSentence(Base):
     project = relationship("Project", back_populates="response_sentences")
     source_sentences = relationship("SourceSentence", back_populates="response_sentence")
     user = relationship("User", back_populates="response_sentence")
+
+
+class UserCurrentSentence(Base):
+    __tablename__ = "ongoing_source_sentence"
+    user_id = Column(Integer, index=True, primary_key=True)
+    project_id = Column(Integer, index=True, primary_key=True)
+    sentence_id = Column(Integer)

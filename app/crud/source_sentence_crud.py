@@ -36,6 +36,16 @@ async def get_by_id(db: AsyncSession, sentence_id: int) -> SourceSentence:
         raise e
 
 
+async def get_first_of_project(db: AsyncSession, project_id: int):
+    try:
+        result = await db.execute(
+            select(SourceSentence).where(project_id == SourceSentence.project_id).order_by(
+                SourceSentence.sentence_id)
+        )
+        return result.scalars().first()
+    except Exception as e:
+        raise e
+
 # async def get_by_sentence_id_and_user_id(db:AsyncSession, sentence)
 
 

@@ -54,11 +54,12 @@ async def get_responses(
 
 @router.get("/source")
 async def get_source_sentence(
+        project_id: int,
         db: AsyncSession = Depends(get_db),
         user: User = Depends(get_current_active_user),
 ):
     try:
-        results = await user_service.get_source_sentence(db, user)
+        results = await user_service.get_source_sentence(db, project_id, user)
         return results
     except Exception as e:
         raise e
