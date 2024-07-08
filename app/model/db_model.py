@@ -61,3 +61,4 @@ class UserCurrentSentence(Base):
     user_id = Column(Integer, index=True, primary_key=True)
     project_id = Column(Integer, index=True, primary_key=True)
     sentence_id = Column(Integer)
+    is_answered = Column(Boolean, default=False)

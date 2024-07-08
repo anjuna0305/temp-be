@@ -25,6 +25,25 @@ async def get_by_source_id(db: AsyncSession, user_id: int, project_id: int):
         raise e
 
 
+async def mark_as_replied(db: AsyncSession, user_id: int, project_id: int):
+    try:
+        result = await db.execute(
+            select(UserCurrentSentence).where(
+                and_(user_id == UserCurrentSentence.user_id, project_id == UserCurrentSentence.project_id))
+        )
+        record = result.scalars().first()
+        if record:
+            record.is_answered = True
+            await db.commit()
+            return True
+        else:
+            return False
+
+    except Exception as e:
+        print("there is a catch \n\n\n\n\n\n\n")
+        raise e
+
+
 async def create(db: AsyncSession, user_id: int, project_id: int, sentence_id: int):
     try:
         user_current_sentence = UserCurrentSentence(
@@ -36,5 +55,21 @@ async def create(db: AsyncSession, user_id: int, project_id: int, sentence_id: i
         await db.commit()
         await db.refresh(user_current_sentence)
         return user_current_sentence
+    except Exception as e:
+        raise e
+
+
+async def update(db: AsyncSession, user_id: int, project_id: int, new_sentence_id: int, ):
+    try:
+        result = await db.execute(
+            select(UserCurrentSentence).where(
+                and_(user_id == UserCurrentSentence.user_id, project_id == UserCurrentSentence.project_id))
+        )
+        record = result.scalars().first()
+        if record:
+            record.sentence_id = new_sentence_id
+            await db.commit()
+            return True
+
     except Exception as e:
         raise e
