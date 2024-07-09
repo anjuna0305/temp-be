@@ -61,7 +61,7 @@ async def get_first_of_project(db: AsyncSession, project_id: int):
     try:
         result = await db.execute(
             select(SourceSentence).where(project_id == SourceSentence.project_id).order_by(
-                SourceSentence.sentence_id)
+                SourceSentence.sentence_id.asc())
         )
         return result.scalars().first()
     except Exception as e:

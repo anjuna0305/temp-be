@@ -49,7 +49,8 @@ async def create(db: AsyncSession, user_id: int, project_id: int, sentence_id: i
         user_current_sentence = UserCurrentSentence(
             user_id=user_id,
             project_id=project_id,
-            sentence_id=sentence_id
+            sentence_id=sentence_id,
+            is_answered=False
         )
         db.add(user_current_sentence)
         await db.commit()
@@ -68,6 +69,7 @@ async def update(db: AsyncSession, user_id: int, project_id: int, new_sentence_i
         record = result.scalars().first()
         if record:
             record.sentence_id = new_sentence_id
+            record.is_answered = False
             await db.commit()
             return True
 
