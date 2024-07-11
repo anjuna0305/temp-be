@@ -101,11 +101,11 @@ async def create_new_response(
         raise e
 
 
-async def get_response_sentence_by_user_id(
-        db: AsyncSession, user_id: int, limit: int, skip: int
+async def get_res_sentence_by_user_and_project_ids(
+        db: AsyncSession, user_id: int, project_id, limit: int, skip: int
 ):
     try:
-        results = await response_sentence_crud.get_by_user_id(db, user_id, limit, skip)
+        results = await response_sentence_crud.get_by_user_id_and_project_id(db, project_id, user_id, limit, skip)
         return results
     except Exception as e:
         raise e

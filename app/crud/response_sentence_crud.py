@@ -69,6 +69,25 @@ async def get_by_user_id_and_source_id(db: AsyncSession, source_id: int, user_id
         raise e
 
 
+async def get_by_user_id_and_project_id(db: AsyncSession, project_id: int, user_id: int, limit_value: int = 20,
+                                        offset_value: int = 0):
+    try:
+        result = await db.execute(
+            select(ResponseSentence).where(
+                and_(
+                    project_id == ResponseSentence.project_id,
+                    user_id == ResponseSentence.user_id,
+                )
+            )
+            .order_by(desc(ResponseSentence.created_at))
+            .limit(limit_value)
+            .offset(offset_value)
+        )
+        return result.scalars().all()
+    except Exception as e:
+        raise e
+
+
 async def create(db: AsyncSession, sentence: ResponseSentence):
     try:
         db.add(sentence)

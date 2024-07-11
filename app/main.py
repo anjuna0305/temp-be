@@ -19,7 +19,7 @@ from app.model.db_model import Base
 
 app = FastAPI()
 
-origins = ["http://127.0.0.1:5173", "http://localhost:*", "http://vh2.local", "http://127.0.0.1:5500"]
+origins = ["http://localhost:5173", "http://localhost:*", "http://vh2.local", "http://127.0.0.1:5500"]
 
 app.add_middleware(
     CORSMiddleware,

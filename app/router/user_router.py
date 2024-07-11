@@ -25,14 +25,15 @@ async def test(id: int, db: AsyncSession = Depends(get_db)):
 
 @router.get("/responses")
 async def get_responses(
+        project_id: int,
         skip: int = 0,
         limit: int = 20,
         db: AsyncSession = Depends(get_db),
         user: User = Depends(get_current_active_user),
 ):
     try:
-        results = await user_service.get_response_sentence_by_user_id(
-            db, user.id, limit, skip
+        results = await user_service.get_res_sentence_by_user_and_project_ids(
+            db, user.id, project_id, limit, skip
         )
         return results
     except Exception as e:
@@ -63,10 +64,11 @@ async def get_source_sentence(
         return results
     except Exception as e:
         raise e
-    
+
+
 @router.get("/source/{source_id}")
 async def get_source_sentence(
-        source_id:int,
+        source_id: int,
         db: AsyncSession = Depends(get_db),
         user: User = Depends(get_current_active_user),
 ):
