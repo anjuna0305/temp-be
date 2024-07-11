@@ -15,6 +15,13 @@ from app.schema.request.request_schema_map import (
     create_response_sentence_request_to_response_sentence,
 )
 
+async def get_sentence_by_id(db:AsyncSession, source_id:int):
+    try:
+        sentence = await source_sentence_crud.get_by_id(db, source_id)
+        return sentence
+    except Exception as e:
+        raise e
+
 
 async def get_next_source_id(db: AsyncSession, source_id: int) -> int | None:
     try:

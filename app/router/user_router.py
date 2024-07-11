@@ -63,6 +63,18 @@ async def get_source_sentence(
         return results
     except Exception as e:
         raise e
+    
+@router.get("/source/{source_id}")
+async def get_source_sentence(
+        source_id:int,
+        db: AsyncSession = Depends(get_db),
+        user: User = Depends(get_current_active_user),
+):
+    try:
+        results = await user_service.get_sentence_by_id(db, source_id)
+        return results
+    except Exception as e:
+        raise e
 
 # @router.get("/source/current")
 # async def get_current_source_sentence(

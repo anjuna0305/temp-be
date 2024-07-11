@@ -8,6 +8,9 @@ from app.auth.auth_router import router as auth_router
 from app.router.user_router import router as user_router
 from app.router.admin_router import router as admin_router
 
+from app.config.database.postgres_config import async_engine
+from app.model.db_model import Base
+
 # from app.routers.test_router import router as test_router
 # from app.routers.api_services_router import router as api_router
 # from app.routers.users_router import router as user_router

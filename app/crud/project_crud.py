@@ -32,3 +32,4 @@ async def create(db: AsyncSession, project: Project):
         return project
     except Exception as e:
         raise e
+
