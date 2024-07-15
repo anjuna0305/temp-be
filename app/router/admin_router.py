@@ -13,6 +13,24 @@ from app.schema.request.request_schema import (
 router = APIRouter()
 
 
+@router.get("/project")
+async def get_all_projects(db: AsyncSession = Depends(get_db)):
+    try:
+        result = await admin_service.get_projects(db)
+        return result
+    except Exception as e:
+        raise e
+
+
+@router.get("/project/{project_id}")
+async def get_all_projects(project_id: int, db: AsyncSession = Depends(get_db)):
+    try:
+        result = await admin_service.get_project_by_id(project_id, db)
+        return result
+    except Exception as e:
+        raise e
+
+
 @router.post("/project/new")
 async def crate_new_project(req_data: CreateProjectRequest, db: AsyncSession = Depends(get_db)):
     try:

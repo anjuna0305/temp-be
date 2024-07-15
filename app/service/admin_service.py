@@ -87,3 +87,21 @@ async def get_responses(db: AsyncSession, project_id: int):
         return zip_filename
     except Exception as e:
         raise e
+
+
+async def get_projects(db: AsyncSession):
+    try:
+        projects = await project_crud.get_all(db)
+        if projects:
+            return projects
+    except Exception as e:
+        raise e
+
+
+async def get_project_by_id(project_id: int, db: AsyncSession):
+    try:
+        projects = await project_crud.get_by_id(db, project_id)
+        if projects:
+            return projects
+    except Exception as e:
+        raise e

@@ -33,3 +33,10 @@ async def create(db: AsyncSession, project: Project):
     except Exception as e:
         raise e
 
+
+async def get_all(db: AsyncSession):
+    try:
+        result = await db.execute(select(Project))
+        return result.scalars().all()
+    except Exception as e:
+        raise e
