@@ -10,7 +10,7 @@ Base = declarative_base()
 
 
 class User(Base):
-    __tablename__ = "user"
+    __tablename__ = "user_table"
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
@@ -48,7 +48,7 @@ class ResponseSentence(Base):
     project_id = Column(Integer, ForeignKey("project.project_id"))
     source_sentence_id = Column(Integer, ForeignKey("source_sentence.sentence_id"))
     response_sentence = Column(String)
-    user_id = Column(Integer, ForeignKey("user.id"))
+    user_id = Column(Integer, ForeignKey("user_table.id"))
     created_at = Column(DateTime(timezone=True), default=datetime.now(timezone.utc))
 
     project = relationship("Project", back_populates="response_sentences")

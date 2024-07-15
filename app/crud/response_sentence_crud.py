@@ -79,7 +79,7 @@ async def get_by_user_id_and_project_id(db: AsyncSession, project_id: int, user_
                     user_id == ResponseSentence.user_id,
                 )
             )
-            .order_by(desc(ResponseSentence.created_at))
+            .order_by(desc(ResponseSentence.source_sentence_id))
             .limit(limit_value)
             .offset(offset_value)
         )
