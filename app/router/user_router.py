@@ -23,6 +23,15 @@ async def test(id: int, db: AsyncSession = Depends(get_db)):
 # async def get_source(source_id:int):
 
 
+@router.get("/project")
+async def get_all_projects(db: AsyncSession = Depends(get_db), user: User = Depends(get_current_active_user)):
+    try:
+        result = await user_service.get_projects(db)
+        return result
+    except Exception as e:
+        raise e
+
+
 @router.get("/responses")
 async def get_responses(
         project_id: int,

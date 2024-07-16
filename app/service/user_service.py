@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 import app.crud.response_sentence_crud as response_sentence_crud
 import app.crud.source_sentence_crud as source_sentence_crud
+import app.crud.project_crud as project_crud
 import app.crud.user_current_sentence_crud as current_sentence_crud
 from app.exception import (
     BadRequestError,
@@ -15,10 +16,20 @@ from app.schema.request.request_schema_map import (
     create_response_sentence_request_to_response_sentence,
 )
 
-async def get_sentence_by_id(db:AsyncSession, source_id:int):
+
+async def get_sentence_by_id(db: AsyncSession, source_id: int):
     try:
         sentence = await source_sentence_crud.get_by_id(db, source_id)
         return sentence
+    except Exception as e:
+        raise e
+
+
+async def get_projects(db: AsyncSession):
+    try:
+        projects = await project_crud.get_all(db)
+        if projects:
+            return projects
     except Exception as e:
         raise e
 

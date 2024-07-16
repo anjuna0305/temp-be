@@ -34,7 +34,8 @@ async def get_all_projects(project_id: int, db: AsyncSession = Depends(get_db)):
 @router.post("/project/new")
 async def crate_new_project(req_data: CreateProjectRequest, db: AsyncSession = Depends(get_db)):
     try:
-        result = admin_service.create_new_project(db, req_data)
+        result = await admin_service.create_new_project(db, req_data)
+        return result
     except Exception as e:
         raise e
 
