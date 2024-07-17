@@ -12,3 +12,4 @@ class ProjectDataResponse(BaseModel):
     project_id: int
     project_name: str
     created_at: str
+    is_published: bool

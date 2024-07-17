@@ -27,6 +27,7 @@ class Project(Base):
     project_id = Column(Integer, primary_key=True, index=True)
     project_name = Column(String, unique=True)
     created_at = Column(DateTime(timezone=True), default=datetime.now(timezone.utc))
+    is_published = Column(Boolean, default=False)
 
     source_sentences = relationship("SourceSentence", back_populates="project")
     response_sentences = relationship("ResponseSentence", back_populates="project")

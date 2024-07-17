@@ -27,7 +27,7 @@ async def get_sentence_by_id(db: AsyncSession, source_id: int):
 
 async def get_projects(db: AsyncSession):
     try:
-        projects = await project_crud.get_all(db)
+        projects = await project_crud.get_all_published(db)
         if projects:
             return projects
     except Exception as e:

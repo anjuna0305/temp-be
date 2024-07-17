@@ -40,3 +40,41 @@ async def get_all(db: AsyncSession):
         return result.scalars().all()
     except Exception as e:
         raise e
+
+
+async def get_all_published(db: AsyncSession):
+    try:
+        result = await db.execute(select(Project).where(Project.is_published == True))
+        return result.scalars().all()
+    except Exception as e:
+        raise e
+
+
+async def unpublish(project_id: int, db: AsyncSession):
+    try:
+        result = await db.execute(
+            select(Project).where(Project.project_id == project_id)
+        )
+        record = result.scalars().first()
+        if record:
+            record.is_published = False
+            await db.commit()
+            return True
+
+    except Exception as e:
+        raise e
+
+
+async def publish(project_id: int, db: AsyncSession):
+    try:
+        result = await db.execute(
+            select(Project).where(Project.project_id == project_id)
+        )
+        record = result.scalars().first()
+        if record:
+            record.is_published = True
+            await db.commit()
+            return True
+
+    except Exception as e:
+        raise e

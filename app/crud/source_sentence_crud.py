@@ -1,4 +1,4 @@
-from sqlalchemy import select, desc, and_
+from sqlalchemy import select, desc, and_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.model.db_model import SourceSentence
@@ -77,5 +77,15 @@ async def create(db: AsyncSession, sentence: SourceSentence):
         await db.commit()
         await db.refresh(sentence)
         return sentence
+    except Exception as e:
+        raise e
+
+
+async def get_count(db, project_id: int):
+    try:
+        stmt = select(func.count()).where(SourceSentence.project_id == project_id)
+        result = await db.execute(stmt)
+        count = result.scalar()
+        return count
     except Exception as e:
         raise e
