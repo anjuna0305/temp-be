@@ -36,7 +36,22 @@ async def get_by_id(db: AsyncSession, sentence_id: int) -> SourceSentence:
         raise e
 
 
-async def get_next_sentence_id(db: AsyncSession, project_id: int, current_sentence_id: int):
+async def get_by_id_and_project_id(
+    db: AsyncSession,
+    sentence_id: int,
+) -> SourceSentence:
+    try:
+        result = await db.execute(
+            select(SourceSentence).where(sentence_id == SourceSentence.sentence_id)
+        )
+        return result.scalars().first()
+    except Exception as e:
+        raise e
+
+
+async def get_next_sentence_id(
+    db: AsyncSession, project_id: int, current_sentence_id: int
+):
     # Step 1: Query for the current SourceSentence
 
     current_sentence = await get_by_id(db, current_sentence_id)
@@ -44,9 +59,15 @@ async def get_next_sentence_id(db: AsyncSession, project_id: int, current_senten
     if current_sentence:
         # Step 2: Query for the next SourceSentence
         next_sentences = await db.execute(
-            select(SourceSentence).where(and_(SourceSentence.sentence_id > current_sentence_id,
-                                              SourceSentence.project_id == project_id)).order_by(
-                SourceSentence.sentence_id.asc()))
+            select(SourceSentence)
+            .where(
+                and_(
+                    SourceSentence.sentence_id > current_sentence_id,
+                    SourceSentence.project_id == project_id,
+                )
+            )
+            .order_by(SourceSentence.sentence_id.asc())
+        )
         next_sentence = next_sentences.scalars().first()
 
         if next_sentence:
@@ -57,11 +78,24 @@ async def get_next_sentence_id(db: AsyncSession, project_id: int, current_senten
         print(f"SourceSentence with sentence_id={current_sentence_id} not found.")
 
 
+async def get_last_sentence_id(db: AsyncSession, project_id: int):
+    # Step 1: Query for the current SourceSentence
+
+    next_sentences = await db.execute(
+        select(SourceSentence)
+        .where(SourceSentence.project_id == project_id)
+        .order_by(SourceSentence.sentence_id.desc())
+    )
+    next_sentence = next_sentences.scalars().first()
+    return next_sentence
+
+
 async def get_first_of_project(db: AsyncSession, project_id: int):
     try:
         result = await db.execute(
-            select(SourceSentence).where(project_id == SourceSentence.project_id).order_by(
-                SourceSentence.sentence_id.asc())
+            select(SourceSentence)
+            .where(project_id == SourceSentence.project_id)
+            .order_by(SourceSentence.sentence_id.asc())
         )
         return result.scalars().first()
     except Exception as e:

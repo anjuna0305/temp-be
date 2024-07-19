@@ -1,4 +1,4 @@
-from sqlalchemy import select, desc, and_, func
+from sqlalchemy import select, desc, and_, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.model.db_model import ResponseSentence
@@ -27,7 +27,7 @@ async def get_by_id(db: AsyncSession, response_id: int):
 
 
 async def get_by_user_id(
-        db: AsyncSession, user_id: int, limit_value: int = 20, offset_value: int = 0
+    db: AsyncSession, user_id: int, limit_value: int = 20, offset_value: int = 0
 ):
     try:
         result = await db.execute(
@@ -42,11 +42,18 @@ async def get_by_user_id(
         raise e
 
 
-async def get_last_source_id_by_user_id(db: AsyncSession, user_id: int):
+async def get_last_source_id_by_user_id(
+    db: AsyncSession, user_id: int, project_id: int
+):
     try:
         result = await db.execute(
             select(ResponseSentence)
-            .where(user_id == ResponseSentence.user_id)
+            .where(
+                and_(
+                    user_id == ResponseSentence.user_id,
+                    ResponseSentence.project_id == project_id,
+                )
+            )
             .order_by(desc(ResponseSentence.created_at))
         )
         return result.scalars().first()
@@ -69,11 +76,17 @@ async def get_by_user_id_and_source_id(db: AsyncSession, source_id: int, user_id
         raise e
 
 
-async def get_by_user_id_and_project_id(db: AsyncSession, project_id: int, user_id: int, limit_value: int = 20,
-                                        offset_value: int = 0):
+async def get_by_user_id_and_project_id(
+    db: AsyncSession,
+    project_id: int,
+    user_id: int,
+    limit_value: int = 20,
+    offset_value: int = 0,
+):
     try:
         result = await db.execute(
-            select(ResponseSentence).where(
+            select(ResponseSentence)
+            .where(
                 and_(
                     project_id == ResponseSentence.project_id,
                     user_id == ResponseSentence.user_id,

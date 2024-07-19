@@ -39,7 +39,7 @@ async def get_all(db: AsyncSession):
         result = await db.execute(select(Project))
         return result.scalars().all()
     except Exception as e:
-        raise e
+        raise e 
 
 
 async def get_all_published(db: AsyncSession):

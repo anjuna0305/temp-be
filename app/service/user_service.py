@@ -128,7 +128,7 @@ async def get_source_sentence(db: AsyncSession, project_id: int, user: User) -> 
         ongoing_source = await current_sentence_crud.get_by_source_id(db, user.id, project_id)
 
         if ongoing_source:
-            print("point 1 \n\n\n\n\n\n\n\n", ongoing_source.is_answered)
+            print("point 1 \n\n\n\n\n\n\n\n", ongoing_source.sentence_id, ongoing_source.project_id)
             # if not answered return current sentence.
             if not ongoing_source.is_answered:
                 print("point 2 \n\n\n\n\n\n\n\n")
@@ -148,7 +148,7 @@ async def get_source_sentence(db: AsyncSession, project_id: int, user: User) -> 
 
         # if not ongoing sentence id in database, check last response and find next source id
         last_response_id = await response_sentence_crud.get_last_source_id_by_user_id(
-            db, user.id
+            db, user.id, project_id
         )
         print("point 5 \n\n\n\n\n\n\n\n")
         if last_response_id:  # if last response id exist
@@ -174,4 +174,12 @@ async def get_source_sentence(db: AsyncSession, project_id: int, user: User) -> 
 
     except Exception as e:
         print("execption 1\n\n\n\n\n\n\n\n")
+        raise e
+
+
+async def get_last_id(db:AsyncSession, project_id:int)->int:
+    try:
+        response = await source_sentence_crud.get_last_sentence_id(db, project_id)
+        return response.sentence_id
+    except Exception as e:
         raise e
