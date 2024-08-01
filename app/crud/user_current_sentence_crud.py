@@ -40,7 +40,6 @@ async def mark_as_replied(db: AsyncSession, user_id: int, project_id: int):
             return False
 
     except Exception as e:
-        print("there is a catch \n\n\n\n\n\n\n")
         raise e
 
 

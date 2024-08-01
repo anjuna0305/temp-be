@@ -115,10 +115,8 @@ async def get_project_responses(
 ):
     try:
         if user_id is None:
-            print("function called 4!\n\n\n\n\n\n")
             zip_path = await admin_service.get_responses_by_users(db, project_id)
         else:
-            print("function called 1!\n\n\n\n\n\n")
             zip_path = await admin_service.get_responses_by_user_id(
                 db, project_id, user_id
             )

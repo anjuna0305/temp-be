@@ -64,13 +64,10 @@ async def get_next_source_id(db: AsyncSession, source_id: int) -> int | None:
 
 async def update_ongoing_sentence(db: AsyncSession, user_id: int, project_id: int, new_sentence_id: int):
     try:
-        print("**** update_ongoing_sentence **** : ")
         current_record = await current_sentence_crud.get_by_source_id(db, user_id, project_id)
         if current_record:
-            print("**** update_ongoing_sentence **** : current record")
             await current_sentence_crud.update(db, user_id, project_id, new_sentence_id)
         else:
-            print("**** update_ongoing_sentence **** : else")
             await current_sentence_crud.create(db, user_id, project_id, new_sentence_id)
         return True
     except Exception as e:
@@ -128,20 +125,16 @@ async def get_source_sentence(db: AsyncSession, project_id: int, user: User) -> 
         ongoing_source = await current_sentence_crud.get_by_source_id(db, user.id, project_id)
 
         if ongoing_source:
-            print("point 1 \n\n\n\n\n\n\n\n", ongoing_source.sentence_id, ongoing_source.project_id)
             # if not answered return current sentence.
             if not ongoing_source.is_answered:
-                print("point 2 \n\n\n\n\n\n\n\n")
                 source_sentence = await source_sentence_crud.get_by_id(db, ongoing_source.sentence_id)
                 return source_sentence
 
             # if answered
             if ongoing_source.is_answered:
-                print("point 3 \n\n\n\n\n\n\n\n")
                 # generate next source id and store it
                 next_id = await get_next_source_id(db, ongoing_source.sentence_id)
                 if next_id:
-                    print("point 4 \n\n\n\n\n\n\n\n")
                     await update_ongoing_sentence(db, user.id, project_id, next_id)
                     source_sentence = await source_sentence_crud.get_by_id(db, next_id)
                     return source_sentence
@@ -150,22 +143,17 @@ async def get_source_sentence(db: AsyncSession, project_id: int, user: User) -> 
         last_response_id = await response_sentence_crud.get_last_source_id_by_user_id(
             db, user.id, project_id
         )
-        print("point 5 \n\n\n\n\n\n\n\n")
         if last_response_id:  # if last response id exist
             next_id = await get_next_source_id(db, last_response_id.source_sentence_id)
             if next_id:
-                print("point 6 \n\n\n\n\n\n\n\n")
                 await update_ongoing_sentence(db, user.id, project_id, next_id)
                 source_sentence = await source_sentence_crud.get_by_id(db, next_id)
                 return source_sentence
 
         # if there are no responses, first sentence of the project will return
         first_sentence = await source_sentence_crud.get_first_of_project(db, project_id)
-        print("sentence: ", first_sentence.source_sentence)
         if first_sentence:  # if first sentence exist save current sentence id in db and return sentence
             sentence_id = first_sentence.sentence_id
-            print("point 7 \n\n\n\n\n\n\n\n")
-            print(first_sentence)
             await update_ongoing_sentence(db, user.id, project_id, sentence_id)
             sentence = await source_sentence_crud.get_by_id(db, sentence_id)
             return sentence
@@ -173,7 +161,6 @@ async def get_source_sentence(db: AsyncSession, project_id: int, user: User) -> 
             raise NotFoundError(detail="First sentence of project not found.")
 
     except Exception as e:
-        print("execption 1\n\n\n\n\n\n\n\n")
         raise e
 
 

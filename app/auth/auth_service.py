@@ -66,7 +66,6 @@ async def login_user(db: AsyncSession, username: str, password: str):
         access_token_expires = timedelta(
             minutes=int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
         )
-        print("\n\n\n\n\n\n\n\n\n user role", user.scopes)
         access_token = create_access_token(
             data={"sub": user.username, "scopes": [str(user.scopes)], "email": user.email},
             expires_delta=access_token_expires,
@@ -103,7 +102,6 @@ async def get_current_user(
         payload = jwt.decode(
             token, os.getenv("SECRET_KEY"), algorithms=[os.getenv("ALGORITHM")]
         )
-        print(payload)
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
@@ -145,7 +143,6 @@ async def get_current_active_user(
 
 def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None):
     to_encode = data.copy()
-    print("to encode: ", to_encode)
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:

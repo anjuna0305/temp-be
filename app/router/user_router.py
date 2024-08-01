@@ -14,7 +14,6 @@ router = APIRouter()
 
 @router.get("/test")
 async def test(id: int, db: AsyncSession = Depends(get_db)):
-    print("controller called **********\n\n\n\n\n")
     next_id = await user_service.get_next_source_id(db, id)
     return next_id
 

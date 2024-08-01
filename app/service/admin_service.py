@@ -86,7 +86,6 @@ async def get_responses(db: AsyncSession, project_id: int):
 
         # Create a zip file
         response_files = os.listdir(temp_dir.name)
-        print("dirs:  ", response_files)
         with zipfile.ZipFile(zip_filename, "w") as zipf:
             for response_file in response_files:
                 zipf.write(os.path.join(temp_dir.name, response_file), response_file)
@@ -143,7 +142,6 @@ async def get_responses_by_user_id(db: AsyncSession, project_id: int, user_id: i
     zip_filename = os.path.join(zip_dir, "files_by_user.zip")
 
     try:
-        print("function called!\n\n\n\n\n\n")
         user = await user_crud.get_by_id(db, user_id)
         if not user:
             raise NotFoundError(detail="User not found")
