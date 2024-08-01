@@ -1,4 +1,4 @@
-from sqlalchemy import select, desc, and_, func, and_
+from sqlalchemy import select, desc, and_, func, and_, distinct
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.model.db_model import ResponseSentence
@@ -117,5 +117,40 @@ async def get_response_count(db: AsyncSession, project_id: int):
         result = await db.execute(stmt)
         count = result.scalar()
         return count
+    except Exception as e:
+        raise e
+
+
+async def get_responded_users(db: AsyncSession, project_id: int):
+    try:
+        stmt = (
+            select(ResponseSentence.user_id)
+            .distinct()
+            .where(ResponseSentence.project_id == project_id)
+        )
+        result = await db.execute(stmt)
+        user_ids = result.scalars().all()
+        return user_ids
+    except Exception as e:
+        raise e
+
+
+async def get_all_by_user_id_and_project_id(
+    db: AsyncSession,
+    project_id: int,
+    user_id: int,
+):
+    try:
+        result = await db.execute(
+            select(ResponseSentence)
+            .where(
+                and_(
+                    project_id == ResponseSentence.project_id,
+                    user_id == ResponseSentence.user_id,
+                )
+            )
+            .order_by(ResponseSentence.source_sentence_id)
+        )
+        return result.scalars().all()
     except Exception as e:
         raise e

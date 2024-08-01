@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import app.crud.project_crud as project_crud
 import app.crud.response_sentence_crud as response_crud
 import app.crud.source_sentence_crud as source_crud
+import app.crud.user_crud as user_crud
 from app.exception import NotFoundError, BadRequestError
 from app.model.db_model import Project, SourceSentence
 from app.schema.request.request_schema import CreateProjectRequest
@@ -93,6 +94,83 @@ async def get_responses(db: AsyncSession, project_id: int):
         return zip_filename
     except Exception as e:
         raise e
+
+
+async def get_responses_by_users(db: AsyncSession, project_id: int):
+    temp_dir = tempfile.TemporaryDirectory()
+    zip_dir = os.path.join(os.getcwd(), "tmp")
+    zip_filename = os.path.join(zip_dir, "files_by_user.zip")
+
+    try:
+        # Generate multiple files (for demo, create two text files)
+        responded_users = await response_crud.get_responded_users(db, project_id)
+
+        if not responded_users:
+            raise NotFoundError(detail="No responses found for this project.")
+
+        for responsed_user_id in responded_users:
+            user = await user_crud.get_by_id(db, responsed_user_id)
+            file_path = os.path.join(temp_dir.name, user.username + ".txt")
+
+            responses = await response_crud.get_all_by_user_id_and_project_id(
+                db, project_id, responsed_user_id
+            )
+            with open(file_path, "w", encoding="utf-8") as user_sentence_file:
+                for response in responses:
+                    source_sentence = await source_crud.get_by_id(
+                        db, response.source_sentence_id
+                    )
+                    user_sentence_file.write(
+                        f"{source_sentence.source_sentence}\t{response.response_sentence}\n"
+                    )
+
+        # Create a zip file
+        response_files = os.listdir(temp_dir.name)
+        with zipfile.ZipFile(zip_filename, "w") as zipf:
+            for response_file in response_files:
+                zipf.write(os.path.join(temp_dir.name, response_file), response_file)
+
+        temp_dir.cleanup()
+        return zip_filename
+    except Exception as e:
+        raise e
+
+
+async def get_responses_by_user_id(db: AsyncSession, project_id: int, user_id:int):
+    temp_dir = tempfile.TemporaryDirectory()
+    zip_dir = os.path.join(os.getcwd(), "tmp")
+    zip_filename = os.path.join(zip_dir, "files_by_user.zip")
+
+    try:
+        user = await user_crud.get_by_id(db, user_id)
+        if not user:
+            raise NotFoundError(detail="User not found")
+
+        file_path = os.path.join(temp_dir.name, user.username + ".txt")
+
+        responses = await response_crud.get_all_by_user_id_and_project_id(
+            db, project_id, user_id
+        )
+        with open(file_path, "w", encoding="utf-8") as user_sentence_file:
+            for response in responses:
+                source_sentence = await source_crud.get_by_id(
+                    db, response.source_sentence_id
+                )
+                user_sentence_file.write(
+                    f"{source_sentence.source_sentence}\t{response.response_sentence}\n"
+                )
+
+        # Create a zip file
+        response_files = os.listdir(temp_dir.name)
+        with zipfile.ZipFile(zip_filename, "w") as zipf:
+            for response_file in response_files:
+                zipf.write(os.path.join(temp_dir.name, response_file), response_file)
+
+        temp_dir.cleanup()
+        return zip_filename
+    except Exception as e:
+        raise e
+
 
 
 async def get_projects(db: AsyncSession):

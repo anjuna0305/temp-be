@@ -6,9 +6,7 @@ from app.model.db_model import User
 
 async def get_by_username(db: AsyncSession, username: str):
     try:
-        result = await db.execute(
-            select(User).where(username == User.username)
-        )
+        result = await db.execute(select(User).where(username == User.username))
         return result.scalars().first()
     except Exception as e:
         raise e
@@ -16,9 +14,15 @@ async def get_by_username(db: AsyncSession, username: str):
 
 async def get_by_email(db: AsyncSession, email: str):
     try:
-        result = await db.execute(
-            select(User).where(email == User.email)
-        )
+        result = await db.execute(select(User).where(email == User.email))
+        return result.scalars().first()
+    except Exception as e:
+        raise e
+
+
+async def get_by_id(db: AsyncSession, id: int):
+    try:
+        result = await db.execute(select(User).where(id == User.id))
         return result.scalars().first()
     except Exception as e:
         raise e

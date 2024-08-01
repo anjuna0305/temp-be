@@ -7,6 +7,7 @@ load_dotenv()
 from app.auth.auth_router import router as auth_router
 from app.router.user_router import router as user_router
 from app.router.admin_router import router as admin_router
+from app.router.test_router import router as test_router
 
 from app.config.database.postgres_config import async_engine
 from app.model.db_model import Base
@@ -40,6 +41,7 @@ app.add_middleware(
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(user_router, prefix="/user", tags=["user"])
 app.include_router(admin_router, prefix="/admin", tags=["admin"])
+app.include_router(test_router, prefix="/test", tags=["test"])
 # app.include_router(test_router, prefix="/test", tags=["test"])
 # app.include_router(user_router, prefix="/users", tags=["users"])
 # app.include_router(admin_router, prefix="/admin", tags=["admins"])

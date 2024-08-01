@@ -96,3 +96,27 @@ async def get_project_responses(project_id: int, db: AsyncSession = Depends(get_
         )
     except Exception as e:
         raise e
+
+
+@router.get("/responses/{project_id}")
+async def get_project_responses(project_id: int, db: AsyncSession = Depends(get_db)):
+    try:
+        zip_path = await admin_service.get_responses_by_users(db, project_id)
+        return FileResponse(
+            path=zip_path, filename="files.zip", media_type="application/zip"
+        )
+    except Exception as e:
+        raise e
+
+
+@router.get("/responses/{project_id}")
+async def get_project_responses(
+    user_id: int, project_id: int, db: AsyncSession = Depends(get_db)
+):
+    try:
+        zip_path = await admin_service.get_responses_by_user_id(db, project_id, user_id)
+        return FileResponse(
+            path=zip_path, filename="files.zip", media_type="application/zip"
+        )
+    except Exception as e:
+        raise e
