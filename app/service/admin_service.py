@@ -13,6 +13,7 @@ from app.exception import NotFoundError, BadRequestError
 from app.model.db_model import Project, SourceSentence
 from app.schema.request.request_schema import CreateProjectRequest
 from app.schema.request.request_schema_map import create_project_to_project
+from app.schema.response.response_schema_map import map_user_to_userdata
 
 
 async def create_new_project(
@@ -136,12 +137,13 @@ async def get_responses_by_users(db: AsyncSession, project_id: int):
         raise e
 
 
-async def get_responses_by_user_id(db: AsyncSession, project_id: int, user_id:int):
+async def get_responses_by_user_id(db: AsyncSession, project_id: int, user_id: int):
     temp_dir = tempfile.TemporaryDirectory()
     zip_dir = os.path.join(os.getcwd(), "tmp")
     zip_filename = os.path.join(zip_dir, "files_by_user.zip")
 
     try:
+        print("function called!\n\n\n\n\n\n")
         user = await user_crud.get_by_id(db, user_id)
         if not user:
             raise NotFoundError(detail="User not found")
@@ -171,6 +173,20 @@ async def get_responses_by_user_id(db: AsyncSession, project_id: int, user_id:in
     except Exception as e:
         raise e
 
+
+async def get_responsed_users(db: AsyncSession, project_id: int):
+    try:
+        user_ids = await response_crud.get_responded_users(db, project_id)
+        if not user_ids:
+            raise NotFoundError(detail="No response found.")
+        users = []
+        for user_id in user_ids:
+            user = await user_crud.get_by_id(db, user_id)
+            if user:
+                users.append(map_user_to_userdata(user))
+        return users
+    except Exception as e:
+        raise e
 
 
 async def get_projects(db: AsyncSession):

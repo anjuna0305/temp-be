@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, File
+from fastapi import APIRouter, Depends, File, Query
 from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -98,23 +98,31 @@ async def get_project_responses(project_id: int, db: AsyncSession = Depends(get_
         raise e
 
 
-@router.get("/responses/{project_id}")
+@router.get("/responsed-users/{project_id}")
 async def get_project_responses(project_id: int, db: AsyncSession = Depends(get_db)):
     try:
-        zip_path = await admin_service.get_responses_by_users(db, project_id)
-        return FileResponse(
-            path=zip_path, filename="files.zip", media_type="application/zip"
-        )
+        users = await admin_service.get_responsed_users(db, project_id)
+        return users
     except Exception as e:
         raise e
 
 
 @router.get("/responses/{project_id}")
 async def get_project_responses(
-    user_id: int, project_id: int, db: AsyncSession = Depends(get_db)
+    project_id: int,
+    user_id: int = Query(None, description="The ID of the user. Optional."),
+    db: AsyncSession = Depends(get_db),
 ):
     try:
-        zip_path = await admin_service.get_responses_by_user_id(db, project_id, user_id)
+        if user_id is None:
+            print("function called 4!\n\n\n\n\n\n")
+            zip_path = await admin_service.get_responses_by_users(db, project_id)
+        else:
+            print("function called 1!\n\n\n\n\n\n")
+            zip_path = await admin_service.get_responses_by_user_id(
+                db, project_id, user_id
+            )
+
         return FileResponse(
             path=zip_path, filename="files.zip", media_type="application/zip"
         )
